@@ -1,0 +1,5 @@
+{
+  "name": "Presupuesto Fácil",
+  "description": "Automatiza tu presupuesto personal registrando ingresos y gastos directamente en Google Sheets desde tu móvil.",
+  "requestFramePermissions": []
+}
