@@ -1,4 +1,4 @@
-# Mi Platica - Finanzas Personales
+# Mi Platicapp - Finanzas Personales
 
 Aplicacion web para registrar ingresos y gastos personales en Google Sheets, con una interfaz simple y una entrada rapida asistida por IA para convertir texto libre en registros estructurados.
 
