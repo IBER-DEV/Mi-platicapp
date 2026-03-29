@@ -3,6 +3,8 @@ import cookieParser from 'cookie-parser';
 import { google } from 'googleapis';
 import { GoogleGenAI, Type } from '@google/genai';
 
+type ReqHandler = (req: express.Request, res: express.Response, next: express.NextFunction) => void;
+
 const app = express();
 
 app.use(express.json());
@@ -22,6 +24,22 @@ const SCOPES = [
 const ai = process.env.GEMINI_API_KEY
   ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
   : null;
+
+// [server-auth-actions] Reusable auth middleware
+const requireAuth: ReqHandler = (req, res, next) => {
+  const tokensStr = req.cookies.google_tokens;
+  if (!tokensStr) {
+    res.status(401).json({ error: 'No autenticado' });
+    return;
+  }
+  try {
+    const tokens = JSON.parse(tokensStr);
+    oauth2Client.setCredentials(tokens);
+    next();
+  } catch {
+    res.status(401).json({ error: 'Tokens inválidos' });
+  }
+};
 
 const CATEGORIES = {
   Ingreso: [
@@ -106,9 +124,7 @@ app.post('/api/auth/logout', (req, res) => {
   res.json({ success: true });
 });
 
-app.post('/api/ai/parse-entry', async (req, res) => {
-  const tokensStr = req.cookies.google_tokens;
-  if (!tokensStr) return res.status(401).json({ error: 'No autenticado' });
+app.post('/api/ai/parse-entry', requireAuth, async (req, res) => {
   if (!ai) return res.status(500).json({ error: 'GEMINI_API_KEY no configurada en servidor' });
 
   const { quickEntry } = req.body;
@@ -145,13 +161,8 @@ app.post('/api/ai/parse-entry', async (req, res) => {
   }
 });
 
-app.get('/api/sheets/list', async (req, res) => {
-  const tokensStr = req.cookies.google_tokens;
-  if (!tokensStr) return res.status(401).json({ error: 'No autenticado' });
-
+app.get('/api/sheets/list', requireAuth, async (req, res) => {
   try {
-    const tokens = JSON.parse(tokensStr);
-    oauth2Client.setCredentials(tokens);
     const drive = google.drive({ version: 'v3', auth: oauth2Client });
 
     const response = await drive.files.list({
@@ -167,15 +178,10 @@ app.get('/api/sheets/list', async (req, res) => {
   }
 });
 
-app.get('/api/sheets/recent', async (req, res) => {
-  const tokensStr = req.cookies.google_tokens;
-  if (!tokensStr) return res.status(401).json({ error: 'No autenticado' });
-
+app.get('/api/sheets/recent', requireAuth, async (req, res) => {
   const { spreadsheetId } = req.query;
 
   try {
-    const tokens = JSON.parse(tokensStr);
-    oauth2Client.setCredentials(tokens);
     const sheets = google.sheets({ version: 'v4', auth: oauth2Client });
 
     const response = await sheets.spreadsheets.values.get({
@@ -192,15 +198,10 @@ app.get('/api/sheets/recent', async (req, res) => {
   }
 });
 
-app.post('/api/sheets/append', async (req, res) => {
-  const tokensStr = req.cookies.google_tokens;
-  if (!tokensStr) return res.status(401).json({ error: 'No autenticado' });
-
+app.post('/api/sheets/append', requireAuth, async (req, res) => {
   const { spreadsheetId, range, values } = req.body;
 
   try {
-    const tokens = JSON.parse(tokensStr);
-    oauth2Client.setCredentials(tokens);
     const sheets = google.sheets({ version: 'v4', auth: oauth2Client });
 
     const response = await sheets.spreadsheets.values.append({
