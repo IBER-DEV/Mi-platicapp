@@ -12,3 +12,5 @@ coverage/
 .agents
 agents
 skills-lock.json
+.docs
+

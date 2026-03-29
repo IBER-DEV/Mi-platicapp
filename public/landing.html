@@ -123,7 +123,7 @@
       align-items: center;
       gap: 10px;
       padding: 15px 30px;
-      border-radius: var(--radius-md);
+      border-radius: 100px;
       font-weight: 700;
       font-size: 0.9rem;
       transition: all var(--transition);
@@ -195,13 +195,18 @@
     /* === NAV === */
     .nav {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 1000px;
       z-index: 100;
-      background: rgba(250, 250, 249, 0.8);
-      backdrop-filter: blur(20px) saturate(1.4);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+      background: rgba(250, 250, 249, 0.75);
+      backdrop-filter: blur(24px) saturate(1.8);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      border-radius: 100px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.05), 0 2px 8px rgba(0, 0, 0, 0.02);
+      transition: all var(--transition);
     }
 
     .nav-inner {
@@ -209,6 +214,7 @@
       align-items: center;
       justify-content: space-between;
       height: 60px;
+      padding: 0 8px 0 24px;
     }
 
     .nav-brand {
@@ -216,8 +222,9 @@
       align-items: center;
       gap: 10px;
       font-weight: 800;
-      font-size: 1rem;
+      font-size: 1.05rem;
       color: var(--tierra-900);
+      flex-shrink: 0;
     }
 
     .nav-brand svg {
@@ -227,43 +234,50 @@
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 28px;
+      gap: 4px;
       list-style: none;
     }
 
     .nav-links a {
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       font-weight: 500;
-      color: var(--tierra-400);
-      transition: color var(--transition);
+      color: var(--tierra-500);
+      padding: 8px 16px;
+      border-radius: 100px;
+      transition: all var(--transition);
+      background: transparent;
     }
 
     .nav-links a:hover {
       color: var(--tierra-900);
+      background: rgba(0, 0, 0, 0.04);
     }
 
     .nav-cta .btn {
-      padding: 9px 20px;
-      font-size: 0.82rem;
+      padding: 10px 22px;
+      font-size: 0.85rem;
+      border-radius: 100px;
     }
 
     .nav-hamburger {
       display: none;
       background: none;
-      padding: 8px;
+      padding: 8px 16px;
       color: var(--tierra-700);
     }
 
     .nav-mobile {
       display: none;
       position: fixed;
-      top: 60px;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      top: 90px;
+      left: 16px;
+      right: 16px;
+      border-radius: 20px;
       background: rgba(250, 250, 249, 0.98);
-      backdrop-filter: blur(20px);
-      padding: 32px 24px;
+      backdrop-filter: blur(24px);
+      padding: 24px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
       z-index: 99;
     }
 
@@ -397,7 +411,7 @@
       z-index: 1;
       width: 100%;
       max-width: 380px;
-      filter: drop-shadow(0 20px 60px rgba(0, 0, 0, 0.5));
+      filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.15));
       animation: float 7s ease-in-out infinite;
       border-radius: 24px;
     }
@@ -459,7 +473,7 @@
 
     .pain-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.02);
     }
 
     .pain-card:hover::before {
@@ -511,57 +525,75 @@
 
     .steps-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 32px;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 64px;
+      align-items: center;
       position: relative;
     }
 
-    .steps-grid::before {
-      content: '';
-      position: absolute;
-      top: 44px;
-      left: 15%;
-      right: 15%;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--plata-200), var(--plata-200), transparent);
+    .steps-video-wrapper {
+      position: relative;
+      width: 100%;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+      background: var(--white);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .steps-video-wrapper video {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
     }
 
     .step {
-      text-align: center;
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      text-align: left;
       position: relative;
     }
 
     .step-num {
-      width: 88px;
-      height: 88px;
-      border-radius: 50%;
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
       background: var(--white);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 24px;
+      flex-shrink: 0;
       position: relative;
       z-index: 1;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.03);
     }
 
     .step-num svg {
       color: var(--plata-600);
     }
 
+    .step-content {
+      flex: 1;
+    }
+
     .step-title {
-      font-size: 1.05rem;
+      font-size: 1.15rem;
       font-weight: 700;
       color: var(--tierra-800);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .step-desc {
-      font-size: 0.875rem;
+      font-size: 0.95rem;
       color: var(--tierra-500);
-      line-height: 1.65;
-      max-width: 260px;
-      margin: 0 auto;
+      line-height: 1.6;
     }
 
     /* === FEATURES === */
@@ -596,7 +628,7 @@
 
     .feature-card:hover {
       transform: translateY(-3px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.02);
       border-color: rgba(22, 163, 74, 0.15);
     }
 
@@ -675,7 +707,7 @@
 
     .audience-card:hover {
       transform: translateY(-3px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.02);
     }
 
     .audience-icon {
@@ -742,8 +774,8 @@
 
     .newsletter-input {
       flex: 1;
-      padding: 14px 18px;
-      border-radius: var(--radius-md);
+      padding: 14px 24px;
+      border-radius: 100px;
       border: 1px solid rgba(22, 163, 74, 0.15);
       background: var(--white);
       font-size: 0.9rem;
@@ -775,8 +807,8 @@
 
     .newsletter-success {
       display: none;
-      padding: 14px 20px;
-      border-radius: var(--radius-md);
+      padding: 14px 24px;
+      border-radius: 100px;
       background: var(--white);
       border: 1px solid var(--plata-400);
       color: var(--plata-800);
@@ -988,7 +1020,7 @@
       </div>
       <div class="hero-visual">
         <div class="hero-glow"></div>
-        <img src="/hero-mockup-2.png" alt="Mi Platicapp — registro de gastos con IA" />
+        <img src="/hero-mockup_2.webp" alt="Mi Platicapp — registro de gastos con IA" />
       </div>
     </div>
   </section>
@@ -1045,37 +1077,48 @@
         <p class="subtitle">Si sabes enviar un mensaje, ya sabes usar Mi Platicapp.</p>
       </div>
       <div class="steps-grid">
-        <div class="step reveal reveal-d1">
-          <div class="step-num">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-              stroke-linecap="round" stroke-linejoin="round">
-              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-            </svg>
-          </div>
-          <h3 class="step-title">Conecta</h3>
-          <p class="step-desc">Vincula tu Google Sheets existente. No cambias nada de tu Excel ni de tu sistema.</p>
+        <div class="steps-video-wrapper reveal reveal-d1">
+          <video src="/App_animation_shows_202603282352.mp4" autoplay loop muted playsinline></video>
         </div>
-        <div class="step reveal reveal-d2">
-          <div class="step-num">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-              stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-            </svg>
+        <div class="steps-list">
+          <div class="step reveal reveal-d2">
+            <div class="step-num">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+              </svg>
+            </div>
+            <div class="step-content">
+              <h3 class="step-title">Conecta</h3>
+              <p class="step-desc">Vincula tu Google Sheets existente. No cambias nada de tu Excel ni de tu sistema.</p>
+            </div>
           </div>
-          <h3 class="step-title">Habla</h3>
-          <p class="step-desc">Escribe como hablas: "Gasté 30mil en taxi ayer". La IA entiende monto, categoría y fecha.
-          </p>
-        </div>
-        <div class="step reveal reveal-d3">
-          <div class="step-num">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-              stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
+          <div class="step reveal reveal-d3">
+            <div class="step-num">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+            </div>
+            <div class="step-content">
+              <h3 class="step-title">Habla</h3>
+              <p class="step-desc">Escribe como hablas: "Gasté 30mil en taxi ayer". La IA entiende monto, categoría y
+                fecha.</p>
+            </div>
           </div>
-          <h3 class="step-title">Listo</h3>
-          <p class="step-desc">El gasto aparece en tu hoja de cálculo, categorizado y con fecha. Así de simple.</p>
+          <div class="step reveal reveal-d4">
+            <div class="step-num">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <div class="step-content">
+              <h3 class="step-title">Listo</h3>
+              <p class="step-desc">El gasto aparece en tu hoja de cálculo, categorizado y con fecha. Así de simple.</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
