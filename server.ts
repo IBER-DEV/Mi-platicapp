@@ -217,6 +217,12 @@ app.post('/api/sheets/append', requireAuth, async (req, res) => {
 });
 
 async function startServer() {
+  // Landing page at / (before Vite middleware so it takes priority)
+  const landingPath = path.join(process.cwd(), 'public', 'landing.html');
+  app.get('/', (req, res) => {
+    res.sendFile(landingPath);
+  });
+
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: { middlewareMode: true },

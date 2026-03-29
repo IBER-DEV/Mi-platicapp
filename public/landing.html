@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mi Platicapp — Registra gastos con IA en tu Google Sheets</title>
+  <meta name="description"
+    content="Deja de buscar celdas. Escribe como hablas y Mi Platicapp registra tus gastos automáticamente en tu hoja de Google Sheets." />
+  <meta property="og:title" content="Mi Platicapp — Registra gastos con IA en tu Google Sheets" />
+  <meta property="og:description"
+    content="Escribe como hablas y la IA registra tus gastos en tu Google Sheets. Sin apps nuevas, sin cambiar tu Excel." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/hero-mockup-2.png" />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <style>
+    /* === DESIGN SYSTEM === */
+    :root {
+      --emerald-50: #ecfdf5;
+      --emerald-100: #d1fae5;
+      --emerald-400: #34d399;
+      --emerald-500: #10b981;
+      --emerald-600: #059669;
+      --emerald-700: #047857;
+      --emerald-800: #065f46;
+      --emerald-900: #064e3b;
+      --emerald-950: #022c22;
+      --stone-50: #fafaf9;
+      --stone-100: #f5f5f4;
+      --stone-200: #e7e5e4;
+      --stone-300: #d6d3d1;
+      --stone-400: #a8a29e;
+      --stone-500: #78716c;
+      --stone-600: #57534e;
+      --stone-700: #44403c;
+      --stone-800: #292524;
+      --stone-900: #1c1917;
+      --white: #ffffff;
+      --radius-lg: 1.5rem;
+      --radius-xl: 2rem;
+      --radius-2xl: 2.5rem;
+      --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03);
+      --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* === RESET === */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--stone-900);
+      background: var(--stone-50);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+    }
+
+    input {
+      font-family: inherit;
+    }
+
+    /* === UTILITIES === */
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--emerald-600);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      color: var(--stone-900);
+      margin-bottom: 16px;
+    }
+
+    .section-subtitle {
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      color: var(--stone-500);
+      max-width: 560px;
+      line-height: 1.7;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 32px;
+      border-radius: 16px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      transition: all var(--transition);
+      text-align: center;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: var(--emerald-600);
+      color: var(--white);
+      box-shadow: 0 4px 16px rgba(5, 150, 105, 0.25);
+    }
+
+    .btn-primary:hover {
+      background: var(--emerald-700);
+      box-shadow: 0 6px 24px rgba(5, 150, 105, 0.35);
+      transform: translateY(-2px);
+    }
+
+    .btn-white {
+      background: var(--white);
+      color: var(--emerald-900);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-white:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--white);
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* === ANIMATIONS === */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 {
+      transition-delay: 0.1s;
+    }
+
+    .reveal-delay-2 {
+      transition-delay: 0.2s;
+    }
+
+    .reveal-delay-3 {
+      transition-delay: 0.3s;
+    }
+
+    /* === NAV === */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(250, 250, 249, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+      transition: all var(--transition);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--stone-900);
+    }
+
+    .nav-brand svg {
+      color: var(--emerald-600);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--stone-500);
+      transition: color var(--transition);
+    }
+
+    .nav-links a:hover {
+      color: var(--stone-900);
+    }
+
+    .nav-cta .btn {
+      padding: 10px 24px;
+      font-size: 0.85rem;
+    }
+
+    .nav-hamburger {
+      display: none;
+      background: none;
+      padding: 8px;
+      color: var(--stone-700);
+    }
+
+    .nav-mobile {
+      display: none;
+      position: fixed;
+      top: 64px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(250, 250, 249, 0.98);
+      backdrop-filter: blur(16px);
+      padding: 32px 24px;
+      z-index: 99;
+    }
+
+    .nav-mobile.open {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .nav-mobile a {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--stone-800);
+      padding: 12px 0;
+      border-bottom: 1px solid var(--stone-100);
+    }
+
+    /* === HERO === */
+    .hero {
+      background: linear-gradient(160deg, var(--emerald-950) 0%, var(--emerald-900) 50%, var(--emerald-800) 100%);
+      padding: 140px 0 80px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(52, 211, 153, 0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -30%;
+      left: -10%;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(5, 150, 105, 0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-content {
+      color: var(--white);
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 100px;
+      padding: 6px 16px 6px 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--emerald-400);
+      margin-bottom: 24px;
+    }
+
+    .hero-badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--emerald-400);
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.4;
+      }
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--emerald-400), #6ee7b7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(0.95rem, 2vw, 1.1rem);
+      color: rgba(255, 255, 255, 0.65);
+      line-height: 1.7;
+      margin-bottom: 36px;
+      max-width: 460px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .hero-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .hero-visual img {
+      width: 100%;
+      max-width: 420px;
+      filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.3));
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-12px);
+      }
+    }
+
+    /* === PAIN/SOLUTION === */
+    .pain {
+      padding: 96px 0;
+      background: var(--white);
+    }
+
+    .pain-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .pain-header .section-subtitle {
+      margin: 0 auto;
+    }
+
+    .pain-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .pain-card {
+      background: var(--stone-50);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      transition: all var(--transition);
+    }
+
+    .pain-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-card-hover);
+    }
+
+    .pain-emoji {
+      font-size: 2rem;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pain-arrow {
+      color: var(--emerald-500);
+      font-size: 1.25rem;
+    }
+
+    .pain-problem {
+      font-size: 0.875rem;
+      color: var(--stone-400);
+      text-decoration: line-through;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .pain-solution {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--stone-800);
+      line-height: 1.5;
+    }
+
+    /* === HOW IT WORKS === */
+    .steps {
+      padding: 96px 0;
+      background: var(--stone-50);
+    }
+
+    .steps-header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+
+    .steps-header .section-subtitle {
+      margin: 0 auto;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      position: relative;
+    }
+
+    .steps-grid::before {
+      content: '';
+      position: absolute;
+      top: 40px;
+      left: calc(16.66% + 16px);
+      right: calc(16.66% + 16px);
+      height: 2px;
+      background: var(--emerald-100);
+    }
+
+    .step {
+      text-align: center;
+      position: relative;
+    }
+
+    .step-number {
+      width: 80px;
+      height: 80px;
+      border-radius: 24px;
+      background: var(--white);
+      border: 2px solid var(--emerald-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      font-weight: 900;
+      color: var(--emerald-600);
+      margin: 0 auto 24px;
+      position: relative;
+      z-index: 1;
+      box-shadow: var(--shadow-card);
+    }
+
+    .step-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--stone-800);
+    }
+
+    .step-desc {
+      font-size: 0.9rem;
+      color: var(--stone-500);
+      line-height: 1.6;
+      max-width: 280px;
+      margin: 0 auto;
+    }
+
+    /* === FEATURES === */
+    .features {
+      padding: 96px 0;
+      background: var(--white);
+    }
+
+    .features-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .features-header .section-subtitle {
+      margin: 0 auto;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: var(--stone-50);
+      border-radius: var(--radius-xl);
+      padding: 36px;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      transition: all var(--transition);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-card-hover);
+      border-color: var(--emerald-100);
+    }
+
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: var(--emerald-50);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+
+    .feature-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--stone-800);
+    }
+
+    .feature-desc {
+      font-size: 0.9rem;
+      color: var(--stone-500);
+      line-height: 1.6;
+    }
+
+    /* === FOR WHOM === */
+    .audience {
+      padding: 96px 0;
+      background: var(--stone-50);
+    }
+
+    .audience-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .audience-header .section-subtitle {
+      margin: 0 auto;
+    }
+
+    .audience-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .audience-card {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      padding: 40px;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      box-shadow: var(--shadow-card);
+      transition: all var(--transition);
+    }
+
+    .audience-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-card-hover);
+    }
+
+    .audience-emoji {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    .audience-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--stone-800);
+    }
+
+    .audience-desc {
+      font-size: 0.95rem;
+      color: var(--stone-500);
+      line-height: 1.7;
+    }
+
+    /* === NEWSLETTER === */
+    .newsletter {
+      padding: 80px 0;
+      background: var(--emerald-50);
+      border-top: 1px solid var(--emerald-100);
+      border-bottom: 1px solid var(--emerald-100);
+    }
+
+    .newsletter-inner {
+      text-align: center;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .newsletter .section-title {
+      color: var(--emerald-900);
+    }
+
+    .newsletter .section-subtitle {
+      margin: 0 auto 32px;
+      color: var(--emerald-800);
+      opacity: 0.7;
+    }
+
+    .newsletter-form {
+      display: flex;
+      gap: 12px;
+    }
+
+    .newsletter-input {
+      flex: 1;
+      padding: 16px 20px;
+      border-radius: 14px;
+      border: 1.5px solid var(--emerald-200, #a7f3d0);
+      background: var(--white);
+      font-size: 0.95rem;
+      outline: none;
+      color: var(--stone-800);
+      transition: border-color var(--transition);
+    }
+
+    .newsletter-input:focus {
+      border-color: var(--emerald-500);
+    }
+
+    .newsletter-input::placeholder {
+      color: var(--stone-400);
+    }
+
+    .newsletter-btn {
+      white-space: nowrap;
+    }
+
+    .newsletter-note {
+      font-size: 0.75rem;
+      color: var(--emerald-700);
+      opacity: 0.5;
+      margin-top: 12px;
+    }
+
+    .newsletter-success {
+      display: none;
+      padding: 16px 24px;
+      border-radius: 14px;
+      background: var(--white);
+      border: 1.5px solid var(--emerald-400);
+      color: var(--emerald-800);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .newsletter-success.show {
+      display: block;
+    }
+
+    /* === FINAL CTA === */
+    .final-cta {
+      padding: 96px 0;
+      background: linear-gradient(160deg, var(--emerald-950) 0%, var(--emerald-900) 100%);
+      text-align: center;
+    }
+
+    .final-cta .section-title {
+      color: var(--white);
+      max-width: 600px;
+      margin: 0 auto 12px;
+    }
+
+    .final-cta .section-subtitle {
+      color: rgba(255, 255, 255, 0.55);
+      margin: 0 auto 36px;
+    }
+
+    /* === FOOTER === */
+    .footer {
+      padding: 32px 0;
+      background: var(--emerald-950);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-copy {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.35);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.35);
+      transition: color var(--transition);
+    }
+
+    .footer-links a:hover {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 768px) {
+
+      .nav-links,
+      .nav-cta {
+        display: none;
+      }
+
+      .nav-hamburger {
+        display: block;
+      }
+
+      .hero {
+        padding: 120px 0 60px;
+      }
+
+      .hero-inner {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        text-align: center;
+      }
+
+      .hero-subtitle {
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .hero-actions {
+        justify-content: center;
+      }
+
+      .hero-visual {
+        order: -1;
+      }
+
+      .hero-visual img {
+        max-width: 280px;
+      }
+
+      .pain-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .steps-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .steps-grid::before {
+        display: none;
+      }
+
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .audience-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .newsletter-form {
+        flex-direction: column;
+      }
+
+      .newsletter-btn {
+        width: 100%;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2.468" />
+          <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" />
+        </svg>
+        Mi Platicapp
+      </a>
+      <ul class="nav-links">
+        <li><a href="#como-funciona">Cómo Funciona</a></li>
+        <li><a href="#caracteristicas">Características</a></li>
+        <li><a href="#para-quien">Para Quién</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="/app" class="btn btn-primary">Empezar Gratis</a>
+      </div>
+      <button class="nav-hamburger" id="hamburger" aria-label="Menú">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="4" x2="20" y1="12" y2="12" />
+          <line x1="4" x2="20" y1="6" y2="6" />
+          <line x1="4" x2="20" y1="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+    <div class="nav-mobile" id="mobile-menu">
+      <a href="#como-funciona" onclick="closeMobile()">Cómo Funciona</a>
+      <a href="#caracteristicas" onclick="closeMobile()">Características</a>
+      <a href="#para-quien" onclick="closeMobile()">Para Quién</a>
+      <a href="/app" class="btn btn-primary" style="margin-top:16px;">Empezar Gratis</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          Potenciado con IA
+        </div>
+        <h1>Registra tus gastos <em>hablando</em>, no buscando celdas</h1>
+        <p class="hero-subtitle">
+          Mi Platicapp conecta con tu Google Sheets y usa inteligencia artificial para que registres gastos escribiendo
+          como hablas. Sin apps nuevas, sin cambiar tu Excel.
+        </p>
+        <div class="hero-actions">
+          <a href="/app" class="btn btn-white">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+              <polyline points="10 17 15 12 10 7" />
+              <line x1="15" x2="3" y1="12" y2="12" />
+            </svg>
+            Empezar Gratis
+          </a>
+          <a href="#como-funciona" class="btn btn-outline">Ver cómo funciona ↓</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <img src="/hero-mockup-2.png" alt="Mi Platicapp — interfaz de registro de gastos con IA" />
+      </div>
+    </div>
+  </section>
+
+  <!-- PAIN → SOLUTION -->
+  <section class="pain">
+    <div class="container">
+      <div class="pain-header reveal">
+        <p class="section-label">El problema</p>
+        <h2 class="section-title">¿Te suena familiar?</h2>
+        <p class="section-subtitle">Llevar un presupuesto no debería ser una tarea más. Así es como lo hacías antes — y
+          cómo se siente ahora.</p>
+      </div>
+      <div class="pain-grid">
+        <div class="pain-card reveal reveal-delay-1">
+          <div class="pain-emoji">😩 <span class="pain-arrow">→</span> 😎</div>
+          <p class="pain-problem">"Abrir el Excel, buscar la hoja correcta, encontrar la fila vacía..."</p>
+          <p class="pain-solution">Escribe "50mil almuerzo" y listo. La IA hace el resto.</p>
+        </div>
+        <div class="pain-card reveal reveal-delay-2">
+          <div class="pain-emoji">😩 <span class="pain-arrow">→</span> 😎</div>
+          <p class="pain-problem">"Se me olvida registrar y a fin de mes no cuadra nada..."</p>
+          <p class="pain-solution">Registra en 5 segundos desde el celular. No se te olvida nada.</p>
+        </div>
+        <div class="pain-card reveal reveal-delay-3">
+          <div class="pain-emoji">😩 <span class="pain-arrow">→</span> 😎</div>
+          <p class="pain-problem">"Categorías confusas, fórmulas rotas, datos en el lugar equivocado..."</p>
+          <p class="pain-solution">La IA categoriza automáticamente según TU sistema de categorías.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CÓMO FUNCIONA -->
+  <section class="steps" id="como-funciona">
+    <div class="container">
+      <div class="steps-header reveal">
+        <p class="section-label">Cómo funciona</p>
+        <h2 class="section-title">3 pasos. 10 segundos.</h2>
+        <p class="section-subtitle">No necesitas aprender nada nuevo. Si sabes enviar un mensaje, ya sabes usar Mi
+          Platicapp.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step reveal reveal-delay-1">
+          <div class="step-number">1</div>
+          <h3 class="step-title">Conecta</h3>
+          <p class="step-desc">Vincula tu Google Sheets existente. No cambias nada de tu Excel ni de tu sistema.</p>
+        </div>
+        <div class="step reveal reveal-delay-2">
+          <div class="step-number">2</div>
+          <h3 class="step-title">Habla</h3>
+          <p class="step-desc">Escribe como hablas: "Gasté 30mil en taxi ayer". La IA entiende monto, categoría y fecha.
+          </p>
+        </div>
+        <div class="step reveal reveal-delay-3">
+          <div class="step-number">3</div>
+          <h3 class="step-title">Listo</h3>
+          <p class="step-desc">El gasto aparece en tu hoja de cálculo, categorizado y con fecha. Así de simple.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CARACTERÍSTICAS -->
+  <section class="features" id="caracteristicas">
+    <div class="container">
+      <div class="features-header reveal">
+        <p class="section-label">Características</p>
+        <h2 class="section-title">Todo lo que necesitas, nada que no</h2>
+        <p class="section-subtitle">Diseñado para hacer una cosa increíblemente bien: que registrar un gasto sea más
+          fácil que olvidarlo.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card reveal reveal-delay-1">
+          <div class="feature-icon">🤖</div>
+          <h3 class="feature-title">IA que entiende tu lenguaje</h3>
+          <p class="feature-desc">Escribe como hablas. "Gasté 50 mil en gasolina" se convierte automáticamente en monto,
+            categoría y descripción.</p>
+        </div>
+        <div class="feature-card reveal reveal-delay-2">
+          <div class="feature-icon">📊</div>
+          <h3 class="feature-title">Tu Excel, potenciado</h3>
+          <p class="feature-desc">Funciona con TU hoja de Google Sheets existente. No migras datos a ningún lado. Tu
+            sistema, tu control.</p>
+        </div>
+        <div class="feature-card reveal reveal-delay-1">
+          <div class="feature-icon">⚡</div>
+          <h3 class="feature-title">Rápido como un mensaje</h3>
+          <p class="feature-desc">Registra un gasto en menos de 10 segundos. Desde cualquier dispositivo con internet.
+            Sin instalar nada.</p>
+        </div>
+        <div class="feature-card reveal reveal-delay-2">
+          <div class="feature-icon">🔒</div>
+          <h3 class="feature-title">Tus datos son tuyos</h3>
+          <p class="feature-desc">Conexión directa con Google. No almacenamos tus datos financieros. Todo queda en tu
+            propia hoja de cálculo.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PARA QUIÉN -->
+  <section class="audience" id="para-quien">
+    <div class="container">
+      <div class="audience-header reveal">
+        <p class="section-label">Para quién es</p>
+        <h2 class="section-title">¿Es para ti?</h2>
+        <p class="section-subtitle">Si alguno de estos perfiles te describe, Mi Platicapp te va a cambiar la vida
+          financiera.</p>
+      </div>
+      <div class="audience-grid">
+        <div class="audience-card reveal reveal-delay-1">
+          <div class="audience-emoji">📋</div>
+          <h3 class="audience-title">Llevas tu presupuesto en Excel</h3>
+          <p class="audience-desc">Ya tienes tu sistema armado en Google Sheets. Lo que necesitas es una forma más
+            rápida de alimentarlo. Mi Platicapp se conecta a tu hoja existente sin cambiar nada — solo la hace más fácil
+            de usar.</p>
+        </div>
+        <div class="audience-card reveal reveal-delay-2">
+          <div class="audience-emoji">💼</div>
+          <h3 class="audience-title">Eres freelancer o independiente</h3>
+          <p class="audience-desc">Ingresos variables, gastos del negocio mezclados con los personales, y nunca hay
+            tiempo para sentarse a organizar todo. Categoriza tus gastos al instante — la IA sabe si es personal o de
+            trabajo.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEWSLETTER -->
+  <section class="newsletter" id="newsletter">
+    <div class="container">
+      <div class="newsletter-inner reveal">
+        <p class="section-label">Newsletter</p>
+        <h2 class="section-title" style="font-size:clamp(1.5rem,3vw,2rem);">Únete a los que ya manejan su platica de
+          forma inteligente</h2>
+        <p class="section-subtitle">Recibe tips de finanzas personales y novedades de Mi Platicapp. Sin spam, lo
+          prometemos.</p>
+        <form class="newsletter-form" id="newsletter-form" onsubmit="handleNewsletter(event)">
+          <input type="email" class="newsletter-input" placeholder="tu@correo.com" required id="newsletter-email" />
+          <button type="submit" class="btn btn-primary newsletter-btn">Suscribirme</button>
+        </form>
+        <div class="newsletter-success" id="newsletter-success">
+          ✅ ¡Listo! Te avisaremos de las novedades.
+        </div>
+        <p class="newsletter-note">Solo recibirás contenido útil. Puedes cancelar en cualquier momento.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta">
+    <div class="container reveal">
+      <p class="section-label" style="color:var(--emerald-400);">¿Listo?</p>
+      <h2 class="section-title">¿Listo para dejar de sufrir con el Excel?</h2>
+      <p class="section-subtitle">Empieza gratis. Solo necesitas tu cuenta de Google.</p>
+      <a href="/app" class="btn btn-white">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+          <polyline points="10 17 15 12 10 7" />
+          <line x1="15" x2="3" y1="12" y2="12" />
+        </svg>
+        Empezar Gratis — Conectar con Google
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p class="footer-copy">© 2026 Mi Platicapp. Hecho con ❤️ en Colombia.</p>
+      <div class="footer-links">
+        <a href="#">Privacidad</a>
+        <a href="#">Términos</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script>
+    // Mobile menu toggle
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    hamburger.addEventListener('click', () => {
+      mobileMenu.classList.toggle('open');
+    });
+    function closeMobile() {
+      mobileMenu.classList.remove('open');
+    }
+
+    // Scroll reveal with IntersectionObserver
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Newsletter form handler
+    function handleNewsletter(e) {
+      e.preventDefault();
+      const form = document.getElementById('newsletter-form');
+      const success = document.getElementById('newsletter-success');
+      form.style.display = 'none';
+      success.classList.add('show');
+    }
+  </script>
+
+</body>
+
+</html>
